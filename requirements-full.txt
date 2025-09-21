@@ -1,0 +1,5 @@
+Flask==2.3.3
+numpy==1.24.3
+ibtparser==1.0.1
+pathlib
+datetime
