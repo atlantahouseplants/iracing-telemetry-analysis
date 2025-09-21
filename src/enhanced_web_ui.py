@@ -192,6 +192,164 @@ HTML_TEMPLATE = '''
             margin-top: 5px;
         }
 
+        .catalog-section {
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(6px);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+        }
+
+        .catalog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .catalog-header h2 {
+            margin: 0;
+            font-size: 1.6em;
+        }
+
+        .catalog-subtitle {
+            font-size: 0.95em;
+            opacity: 0.85;
+        }
+
+        .catalog-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .catalog-meta .meta-item {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 10px 15px;
+            border-radius: 10px;
+            min-width: 150px;
+        }
+
+        .catalog-meta .meta-label {
+            display: block;
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            opacity: 0.8;
+        }
+
+        .catalog-meta .meta-value {
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+
+        .catalog-refresh {
+            padding: 10px 18px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .catalog-refresh:hover {
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        .catalog-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .catalog-filters label {
+            display: flex;
+            flex-direction: column;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .catalog-filters select {
+            margin-top: 4px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            min-width: 160px;
+        }
+
+        .catalog-reset-btn {
+            padding: 10px 18px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .catalog-reset-btn:hover {
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        .catalog-reset-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .catalog-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .catalog-table {
+            width: 100%;
+            border-collapse: collapse;
+            color: white;
+        }
+
+        .catalog-table th,
+        .catalog-table td {
+            padding: 10px 12px;
+            text-align: left;
+        }
+
+        .catalog-table thead {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .catalog-table tbody tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .catalog-table .empty-row td {
+            text-align: center;
+            opacity: 0.7;
+            padding: 20px 12px;
+        }
+
+        @media (max-width: 768px) {
+            .catalog-meta {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .catalog-filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .catalog-filters select, .catalog-reset-btn {
+                width: 100%;
+            }
+        }
+
         .main-content {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -476,6 +634,67 @@ HTML_TEMPLATE = '''
         <div class="question-btn" onclick="loadAdvancedMetrics()" style="background: linear-gradient(135deg, #795548, #5d4037); color: white;">Advanced Metrics</div>
     </div>
 
+<div class="catalog-section">
+    <div class="catalog-header">
+        <div>
+            <h2>Session Catalog</h2>
+            <p class="catalog-subtitle">Latest processed telemetry sessions</p>
+        </div>
+        <button class="catalog-refresh" id="catalog-refresh-btn" type="button">Refresh</button>
+    </div>
+    <div class="catalog-meta">
+        <div class="meta-item">
+            <span class="meta-label">Total Sessions</span>
+            <span class="meta-value" id="catalog-total-sessions">0</span>
+        </div>
+        <div class="meta-item">
+            <span class="meta-label">Tracks</span>
+            <span class="meta-value" id="catalog-track-count">0</span>
+        </div>
+        <div class="meta-item">
+            <span class="meta-label">Cars</span>
+            <span class="meta-value" id="catalog-car-count">0</span>
+        </div>
+        <div class="meta-item">
+            <span class="meta-label">Best Lap</span>
+            <span class="meta-value" id="catalog-best-lap">--</span>
+        </div>
+    </div>
+    <div class="catalog-filters">
+        <label>Track
+            <select id="catalog-track-filter">
+                <option value="">All Tracks</option>
+            </select>
+        </label>
+        <label>Car
+            <select id="catalog-car-filter">
+                <option value="">All Cars</option>
+            </select>
+        </label>
+        <button class="catalog-reset-btn" id="catalog-reset-btn" type="button" disabled>Reset Filters</button>
+    </div>
+    <div class="catalog-table-wrapper">
+        <table class="catalog-table">
+            <thead>
+                <tr>
+                    <th>When</th>
+                    <th>Track</th>
+                    <th>Car</th>
+                    <th>Laps</th>
+                    <th>Fastest Lap</th>
+                    <th>Average Lap</th>
+                    <th>Consistency</th>
+                </tr>
+            </thead>
+            <tbody id="catalog-table-body">
+                <tr class="empty-row">
+                    <td colspan="7">No sessions cataloged yet. Process telemetry to see history here.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
     <div class="main-content">
         <div class="chat-section">
             <div class="chat-header">
@@ -572,6 +791,80 @@ HTML_TEMPLATE = '''
     </div>
 
     <script>
+const CATALOG_STORAGE_KEY = 'enhancedTelemetryCatalogFilters';
+const CATALOG_PAGE_LIMIT = 50;
+let currentTrackFilter = '';
+let currentCarFilter = '';
+
+function normalizeFilterValue(value) {
+    if (typeof value !== 'string') {
+        return '';
+    }
+    const trimmed = value.trim();
+    if (!trimmed) {
+        return '';
+    }
+    const lower = trimmed.toLowerCase();
+    if (lower === 'all tracks' || lower === 'all cars' || lower === 'all') {
+        return '';
+    }
+    return trimmed;
+}
+
+function buildFilterQueryParams(initial = {}) {
+    const params = new URLSearchParams(initial);
+    const track = normalizeFilterValue(currentTrackFilter);
+    const car = normalizeFilterValue(currentCarFilter);
+    if (track) {
+        params.append('track', track);
+    }
+    if (car) {
+        params.append('car', car);
+    }
+    return params;
+}
+
+function loadStoredFilters() {
+    if (typeof window === 'undefined' || !window.localStorage) {
+        return { track: '', car: '' };
+    }
+    try {
+        const raw = window.localStorage.getItem(CATALOG_STORAGE_KEY);
+        if (!raw) {
+            return { track: '', car: '' };
+        }
+        const parsed = JSON.parse(raw);
+        return {
+            track: normalizeFilterValue(parsed.track),
+            car: normalizeFilterValue(parsed.car)
+        };
+    } catch (error) {
+        console.warn('Unable to read stored catalog filters', error);
+        return { track: '', car: '' };
+    }
+}
+
+function storeFilters(track, car) {
+    if (typeof window === 'undefined' || !window.localStorage) {
+        return;
+    }
+    try {
+        window.localStorage.setItem(
+            CATALOG_STORAGE_KEY,
+            JSON.stringify({
+                track: normalizeFilterValue(track),
+                car: normalizeFilterValue(car)
+            })
+        );
+    } catch (error) {
+        console.warn('Unable to persist catalog filters', error);
+    }
+}
+
+function persistCurrentFilters() {
+    storeFilters(currentTrackFilter, currentCarFilter);
+}
+
         function askQuestion(question) {
             document.getElementById('question-input').value = question;
             sendQuestion();
